@@ -1,8 +1,13 @@
-﻿@model Category
+﻿@model CategoryCreateProcessPageVm
 
 
 <form asp-action="CreateCategory" asp-controller="Category" method="post">
-    <input type="text" asp-for="CategoryName" /> <br /> <br />
+    <input type="text" asp-for="Category.CategoryName" placeholder="Kategori ismi giriniz" /> <br /> <br />
+
+
+    <input type="text" asp-for="AppUser.UserName" placeholder="Kullanıcı ismi giriniz" /> <br /> <br />
+
+    <input type="text" asp-for="AppUser.Password" placeholder="Sifre giriniz" />
 
     <button class="btn btn-primary">Kategori yarat</button>
 </form>

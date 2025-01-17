@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using MVCEtut_0.Models.ContextClasses;
 using MVCEtut_0.Models.Entities;
+using MVCEtut_0.Models.PageVms.CategoryControllerProcess;
+using MVCEtut_0.Models.PureVms.RequestModels.Categories;
+using MVCEtut_0.Models.PureVms.ResponseModels.Categories;
 
 namespace MVCEtut_0.Controllers
 {
@@ -16,9 +19,30 @@ namespace MVCEtut_0.Controllers
 
         public async Task<IActionResult> CategoryList()
         {
-            
+            //List<Category>
+            //Category
             List<Category> categories =await _context.Categories.ToListAsync();
-            return View(categories);
+            List<CategoryResponseModel> categoryResponse = categories.Select(x => new CategoryResponseModel
+            {
+                Id  = x.Id,
+                CategoryName = x.CategoryName,
+            }).ToList();
+
+            CategoryResponseModel? popularCategory =  _context.Categories.Where(x => x.Id == 5).Select(x => new CategoryResponseModel
+            {
+                Id = x.Id,
+                CategoryName = x.CategoryName
+            }).FirstOrDefault();
+
+            CategoryProcessPageVm cpVm = new()
+            {
+                Categories = categoryResponse,
+                TheMostPopularCategory = popularCategory
+            };
+
+
+
+            return View(cpVm);
         }
 
         public IActionResult CreateCategory()
@@ -27,20 +51,43 @@ namespace MVCEtut_0.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCategory(Category category)
+        public async Task<IActionResult> CreateCategory(CategoryCreateProcessPageVm model)
         {
-            await  _context.Categories.AddAsync(category);
+            Category c = new()
+            {
+                CategoryName = model.Category.CategoryName
+            };
+
+            AppUser appUser = new()
+            {
+                UserName = model.AppUser.UserName,
+                Password = model.AppUser.Password
+            };
+
+            await  _context.Categories.AddAsync(c);
+            await _context.AppUsers.AddAsync(appUser);
             await _context.SaveChangesAsync();
             return RedirectToAction("CategoryList");
         }
 
         public async Task<IActionResult> UpdateCategory(int id)
         {
-            return View(await _context.Categories.FindAsync(id));
+            UpdateCategoryRequestModel? category = await _context.Categories.Where(x => x.Id == id).Select(x => new UpdateCategoryRequestModel
+            {
+                Id = x.Id,
+                CategoryName = x.CategoryName
+            }).FirstOrDefaultAsync();
+
+            CategoryUpdateProcessPageVm cpVm = new()
+            {
+                Category = category
+            };
+
+            return View(cpVm);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateCategory(Category category)
+        public async Task<IActionResult> UpdateCategory(UpdateCategoryRequestModel category)
         {
             Category originalValue = await _context.Categories.FindAsync(category.Id);
             originalValue.CategoryName = category.CategoryName;

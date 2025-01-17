@@ -1,11 +1,11 @@
-﻿@model Category
+﻿@model CategoryUpdateProcessPageVm
 
 
 <form asp-action="UpdateCategory" asp-controller="Category" method="post">
 
-    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Category.Id" />
 
-    <input type="text" asp-for="CategoryName" /> <br /> <br />
+    <input type="text" asp-for="Category.CategoryName" /> <br /> <br />
 
     <button class="btn btn-primary">Kategori güncelle</button>
 </form>
